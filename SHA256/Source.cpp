@@ -175,16 +175,7 @@ int main()
 		uint32_t chunks[64]{};
 		convertStringTo32BitChunks(secondBinaryBlock, chunks);
 
-		for (int j = 0; j < 16; j++)
-		{
-			cout << chunks[j] << ' ';
-		}
 	}
-
-	
-
-	
-
 
 	delete[] firstBinary;
 
