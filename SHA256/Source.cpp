@@ -64,7 +64,7 @@ uint32_t change(const uint32_t a, const uint32_t b, const uint32_t c)
 int len(const char* string)
 {
 	int length = 0;
-	for (int i = 0; i < string[i] != '\0'; i++)
+	while (string[length] != '\0')
 	{
 		length++;
 	}
@@ -72,19 +72,27 @@ int len(const char* string)
 }
 
 //concat the second value with the first one from given index
-void concat(int* first, const int currentIndex, int* second, int secondLen)
+void concat(int* first, const int startIndex, const int* second, int secondLen)
 {
 	for (int i = 0; i < secondLen; i++)
 	{
-		first[currentIndex + i] = second[i];
+		first[startIndex + i] = second[i];
 	}
 }
 
-void concat(char* first, const int currentIndex, char* second, int secondLen)
+void concat(char* first, const int startIndex, const char* second, int secondLen)
 {
 	for (int i = 0; i < secondLen; i++)
 	{
-		first[currentIndex + i] = second[i];
+		first[startIndex + i] = second[i];
+	}
+}
+
+void copyPartOfString(int* first, const int* second, const int startIndex, const int length)
+{
+	for (int i = 0; i < length; i++)
+	{
+		first[i] = second[startIndex + i];
 	}
 }
 
@@ -126,7 +134,7 @@ void convertWordToBinary(const char* word, int* binaryArray)
 }
 
 //Rearrange the big chunk into 64 smaller ones
-void convertStringTo32BitChunks(int* string, uint32_t* chunkWords)
+void convertStringTo32BitChunks(const int* string, uint32_t* chunkWords)
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -197,51 +205,33 @@ void compressAndModify(const uint32_t* w)
 //Convert the int into hex and print
 void decToHex(uint32_t n, char* hex)
 {
-	int i = 0;
+	int i = 7;
 	while (n != 0) {
 		
 		int rem = 0;
-		char ch;
+		char ch = 0;
 		rem = n % 16;
 		if (rem < 10) {
 			ch = rem + 48;
 		}
 		else {
-			ch = rem + 55;
+			ch = rem + 87;
 		}
 		hex[i] = ch;
 		n = n / 16;
-		i++;
+		i--;
 	}
-
-	// reversing the hex string to get the final result
-	/*const int length = len(hex);
-	int k = hex[length - 1];
-	for (int j = 0; j < length / 2; j++)
-	{
-		swap(hex[i], hex[j]);
-		j++;
-		k--;
-	}*/
 }
 
-//int findFinalLength(char* hex)
-//{
-//	int count = 0;
-//	for (int i = 0; hex[i] != '\0'; i++)
-//	{
-//		count++;
-//	}
-//	return count;
-//}
-
-//void printHex(char* hex)
-//{
-//	for (int i = 0; hex[i] != '\0'; i++)
-//	{
-//
-//	}
-//}
+//Print the hex
+void printHex(const char* hex)
+{
+	const int length = len(hex);
+	for (int i = 0; i < length + 1; i++)
+	{
+		cout << hex[i];
+	}
+}
 
 
 
@@ -281,40 +271,26 @@ int main()
 	{
 		//Creating the 64 array of 32 bits
 		uint32_t w[64]{};
-		convertStringTo32BitChunks(secondBinaryBlock, w);
+		int messageToConvert[512]{};
+		const int currentStartIndex = (i + 1) * 512;
+		copyPartOfString(messageToConvert, secondBinaryBlock, i * 512, 512);
+		convertStringTo32BitChunks(messageToConvert, w);
 
 		//Message schedule
 		createMessageSchedule(w);
 
 		//Compression
 		compressAndModify(w);
-
-		/*cout << H[0] << endl;
-		cout << H[1] << endl;
-		cout << H[2] << endl;
-		cout << H[3] << endl;
-		cout << H[4] << endl;
-		cout << H[5] << endl;
-		cout << H[6] << endl;
-		cout << H[7] << endl;*/
-
 	}
 
 	int index = 0;
-	char finalHex[160]{};
+	char hexString[20]{};
 	for (int i = 0; i < 8; i++)
 	{
-		char hex_string[20]{};
-		decToHex(H[i], hex_string);
-		int asd = len(hex_string);
-		for (int m = 0; m < 10; m++)
-		{
-			cout << hex_string[m];
-		}
-		
-		/*concat(finalHex, index, hex_string, currentHexLength);
-		printHex(hex_string);*/
+		decToHex(H[i], hexString);
+		printHex(hexString);
 	}
 
 	delete[] firstBinary;
+	delete[] secondBinaryBlock;
 }
