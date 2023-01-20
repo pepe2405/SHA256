@@ -80,6 +80,14 @@ void concat(int* first, const int currentIndex, int* second, int secondLen)
 	}
 }
 
+void concat(char* first, const int currentIndex, char* second, int secondLen)
+{
+	for (int i = 0; i < secondLen; i++)
+	{
+		first[currentIndex + i] = second[i];
+	}
+}
+
 void convertLastLineToAppend(int n, int* binary)
 {
 	for (int i = 63; i >= 0; i--)
@@ -146,7 +154,7 @@ void createMessageSchedule(uint32_t* w)
 	}
 }
 
-void compressionAndModifyFinal(const uint32_t* w)
+void compressAndModify(const uint32_t* w)
 {
 	uint32_t a = H[0];
 	uint32_t b = H[1];
@@ -159,12 +167,12 @@ void compressionAndModifyFinal(const uint32_t* w)
 	//Compression loop
 	for (int i = 0; i < 64; i++)
 	{
-		uint32_t S1 = bigSigma1(e);
-		uint32_t ch = change(e, f, g);
-		uint32_t temp1 = h + S1 + ch + k[i] + w[i];
-		uint32_t S0 = bigSigma0(a);
-		uint32_t maj = major(a, b, c);
-		uint32_t temp2 = S0 + maj;
+		const uint32_t S1 = bigSigma1(e);
+		const uint32_t ch = change(e, f, g);
+		const uint32_t temp1 = h + S1 + ch + k[i] + w[i];
+		const uint32_t S0 = bigSigma0(a);
+		const uint32_t maj = major(a, b, c);
+		const uint32_t temp2 = S0 + maj;
 		h = g;
 		g = f;
 		f = e;
@@ -173,8 +181,6 @@ void compressionAndModifyFinal(const uint32_t* w)
 		c = b;
 		b = a;
 		a = temp1 + temp2;
-
-		
 	}
 
 	//Modifying final values
@@ -188,9 +194,59 @@ void compressionAndModifyFinal(const uint32_t* w)
 	H[7] = H[7] + h;
 }
 
+//Convert the int into hex and print
+void decToHex(uint32_t n, char* hex)
+{
+	int i = 0;
+	while (n != 0) {
+		
+		int rem = 0;
+		char ch;
+		rem = n % 16;
+		if (rem < 10) {
+			ch = rem + 48;
+		}
+		else {
+			ch = rem + 55;
+		}
+		hex[i] = ch;
+		n = n / 16;
+		i++;
+	}
+
+	// reversing the hex string to get the final result
+	/*const int length = len(hex);
+	int k = hex[length - 1];
+	for (int j = 0; j < length / 2; j++)
+	{
+		swap(hex[i], hex[j]);
+		j++;
+		k--;
+	}*/
+}
+
+//int findFinalLength(char* hex)
+//{
+//	int count = 0;
+//	for (int i = 0; hex[i] != '\0'; i++)
+//	{
+//		count++;
+//	}
+//	return count;
+//}
+
+//void printHex(char* hex)
+//{
+//	for (int i = 0; hex[i] != '\0'; i++)
+//	{
+//
+//	}
+//}
+
+
+
 int main()
 {
-	int zerosArray[10000]{};
 	//Creating the first binary block (only the string in binary)
 	char word[10000];
 	cin.getline(word, 10000);
@@ -200,19 +256,18 @@ int main()
 	convertWordToBinary(word, firstBinary);
 	
 	//Creating the second binary block
-	const int l = binaryLength;
 	int k = 0;
 
-	while((l + k + 1 + 64) % 512 != 0)
+	while((binaryLength + k + 1 + 64) % 512 != 0)
 	{
 		k++;
 	}
-	const int newLength = l + k + 1 + 64;
+	const int newLength = binaryLength + k + 65;
 
 	//Appending the zeros and the last line
 	int* secondBinaryBlock = new int[newLength] {};
-	concat(secondBinaryBlock, 0, firstBinary, l);
-	secondBinaryBlock[l] = 1;
+	concat(secondBinaryBlock, 0, firstBinary, binaryLength);
+	secondBinaryBlock[binaryLength] = 1;
 	
 	int binaryToAppend[64]{};
 	convertLastLineToAppend(binaryLength, binaryToAppend);
@@ -232,11 +287,33 @@ int main()
 		createMessageSchedule(w);
 
 		//Compression
-		compressionAndModifyFinal(w);
+		compressAndModify(w);
 
+		/*cout << H[0] << endl;
+		cout << H[1] << endl;
+		cout << H[2] << endl;
+		cout << H[3] << endl;
+		cout << H[4] << endl;
+		cout << H[5] << endl;
+		cout << H[6] << endl;
+		cout << H[7] << endl;*/
+
+	}
+
+	int index = 0;
+	char finalHex[160]{};
+	for (int i = 0; i < 8; i++)
+	{
+		char hex_string[20]{};
+		decToHex(H[i], hex_string);
+		int asd = len(hex_string);
+		for (int m = 0; m < 10; m++)
+		{
+			cout << hex_string[m];
+		}
 		
-		
-		
+		/*concat(finalHex, index, hex_string, currentHexLength);
+		printHex(hex_string);*/
 	}
 
 	delete[] firstBinary;
