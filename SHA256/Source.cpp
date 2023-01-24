@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -14,6 +15,8 @@ uint32_t K[64] = { 0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0
 						0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2 };
 uint32_t state[8]{ H[0], H[1], H[2], H[3], H[4], H[5], H[6], H[7] };
 const int CHUNK_SIZE = 512;
+const int BUFFER_SIZE = 10000;
+
 
 //BIT FUNCTIONS
 uint32_t rotateRight(const uint32_t x, const int amount)
@@ -50,6 +53,32 @@ uint32_t choice(const uint32_t a, const uint32_t b, const uint32_t c)
 }
 
 //COMMON METHODS
+int fileWork(char* input)
+{
+	char fileName[300]{};
+	cin >> fileName;
+
+	fstream myFile;
+	myFile.open(fileName);
+	if (!myFile.is_open())
+	{
+		cout << "Error while opening the file.";
+		return 0;
+	}
+
+	myFile.getline(input, BUFFER_SIZE);
+	myFile.close();
+	return 1;
+}
+
+void finalFileProcessing(const char* input, const char* finalHexString)
+{
+	fstream finalFile;
+	finalFile.open("result.txt");
+	finalFile << input << " =&&= " << finalHexString << endl;
+	finalFile.close();
+}
+
 //get length of a string
 int len(const char* string)
 {
@@ -243,18 +272,8 @@ void decToHex(uint32_t n, char* hex)
 	}
 }
 
-void printHex(const char* hex)
-{
-	const int length = len(hex);
-	for (int i = 0; i < length + 1; i++)
-	{
-		cout << hex[i];
-	}
-}
-
 void createFinalHex(char* finalHex)
 {
-	
 	char hexString[9]{};
 	for (int i = 0; i < 8; i++)
 	{
@@ -263,13 +282,27 @@ void createFinalHex(char* finalHex)
 	}
 }
 
-
+void printHex(const char* hex)
+{
+	cout << "The has value of the string: " << endl;
+	const int length = len(hex);
+	for (int i = 0; i < length + 1; i++)
+	{
+		cout << hex[i];
+	}
+}
 
 int main()
 {
+	//User input
+	cout << "Enter a file name: " << endl;
+
 	//STEP 1 - PRE PROCESSING
-	char input[10000];
-	cin.getline(input, 10000);
+	char input[BUFFER_SIZE];
+	if (fileWork(input) == 0)
+	{
+		return -1;
+	}
 
 	//STEP 2 - Creating first binary block
 	const int STRING_LENGTH = len(input);
@@ -293,6 +326,9 @@ int main()
 	char finalHexString[65]{};
 	createFinalHex(finalHexString);
 	printHex(finalHexString);
+
+	//Write the complete data
+	finalFileProcessing(input, finalHexString);
 
 	delete[] firstBinary;
 	delete[] secondBinaryBlock;
