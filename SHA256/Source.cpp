@@ -75,6 +75,10 @@ void finalFileProcessing(const char* input, const char* finalHexString)
 {
 	fstream finalFile;
 	finalFile.open("result.txt");
+	if (!finalFile.is_open())
+	{
+		cout << endl << "Result file is missing! The hash won't be saved!!";
+	}
 	finalFile << input << " =&&= " << finalHexString << endl;
 	finalFile.close();
 }
@@ -284,12 +288,13 @@ void createFinalHex(char* finalHex)
 
 void printHex(const char* hex)
 {
-	cout << "The has value of the string: " << endl;
+	cout << "The hash value of the string: " << endl;
 	const int length = len(hex);
 	for (int i = 0; i < length + 1; i++)
 	{
 		cout << hex[i];
 	}
+	cout << endl;
 }
 
 int main()
