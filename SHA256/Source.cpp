@@ -52,7 +52,7 @@ uint32_t choice(const uint32_t a, const uint32_t b, const uint32_t c)
 	return (a & b) ^ ((~a) & c);
 }
 
-//COMMON METHODS
+//File work methods
 int fileWork(char* input)
 {
 	char fileName[300]{};
@@ -74,7 +74,7 @@ int fileWork(char* input)
 void finalFileProcessing(const char* input, const char* finalHexString)
 {
 	fstream finalFile;
-	finalFile.open("result.txt");
+	finalFile.open("result.txt", ios_base::app);
 	if (!finalFile.is_open())
 	{
 		cout << endl << "Result file is missing! The hash won't be saved!!";
@@ -300,7 +300,7 @@ void printHex(const char* hex)
 int main()
 {
 	//User input
-	cout << "Enter a file name: " << endl;
+	cout << "Enter a file name: (text.txt is the default file)" << endl;
 
 	//STEP 1 - PRE PROCESSING
 	char input[BUFFER_SIZE];
